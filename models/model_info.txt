@@ -1,0 +1,13 @@
+TruthLens AI - Fake News Detection Model
+==================================================
+Model: Logistic Regression
+Vectorizer: TF-IDF
+Max Features: 5000
+N-gram Range: (1, 2)
+
+--- Evaluation Metrics ---
+Test Accuracy: 81.82%
+Precision: 87.01%
+Recall: 81.82%
+F1-Score: 81.52%
+Trained: 2026-03-07T12:57:12.907425

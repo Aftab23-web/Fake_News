@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - TruthLens AI</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#6366f1',
+                        secondary: '#8b5cf6',
+                        accent: '#ec4899',
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 min-h-screen">
+    
+    <!-- Navigation -->
+    <nav class="glass-nav fixed w-full top-0 z-50">
+        <div class="container mx-auto px-6 py-4">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center space-x-3">
+                    <i class="fas fa-shield-alt text-3xl text-primary"></i>
+                    <h1 class="text-2xl font-bold text-white">TruthLens AI - Dashboard</h1>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <span class="text-white">
+                        <i class="fas fa-user-circle mr-2"></i>
+                        <span id="username">Admin</span>
+                    </span>
+                    <button onclick="logout()" class="nav-link text-white hover:text-red-400 transition duration-300">
+                        <i class="fas fa-sign-out-alt mr-2"></i>Logout
+                    </button>
+                    <a href="/" class="nav-link text-white hover:text-primary transition duration-300">
+                        <i class="fas fa-home mr-2"></i>Home
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container mx-auto px-6 pt-32 pb-12">
+        
+        <!-- Page Header -->
+        <div class="text-center mb-12 animate-fade-in">
+            <h2 class="text-4xl font-bold text-white mb-2">
+                <i class="fas fa-users-cog mr-3"></i>User Management Dashboard
+            </h2>
+            <p class="text-gray-300">Monitor user activity and search history</p>
+        </div>
+
+        <!-- Loading Indicator -->
+        <div id="loadingIndicator" class="text-center py-12">
+            <div class="inline-block">
+                <div class="spinner"></div>
+                <p class="text-white mt-4">Loading dashboard...</p>
+            </div>
+        </div>
+
+        <!-- Dashboard Content -->
+        <div id="dashboardContent" class="hidden">
+            
+            <!-- Model Evaluation Section -->
+            <div class="glass-card p-6 mb-8">
+                <h3 class="text-xl font-bold text-white mb-4">
+                    <i class="fas fa-chart-line mr-2"></i>Model Evaluation Metrics
+                </h3>
+                
+                <div id="modelMetricsLoading" class="text-center py-4">
+                    <div class="inline-block">
+                        <div class="spinner"></div>
+                        <p class="text-white mt-2">Loading metrics...</p>
+                    </div>
+                </div>
+                
+                <div id="modelMetricsError" class="hidden text-center py-4">
+                    <p class="text-red-400"><i class="fas fa-exclamation-triangle mr-2"></i>Failed to load model metrics</p>
+                    <p class="text-gray-400 text-sm mt-2">Please ensure the model has been trained.</p>
+                </div>
+                
+                <div id="modelMetricsContent" class="hidden">
+                    <!-- Metrics Grid -->
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+                        <!-- Accuracy Card -->
+                        <div class="bg-white/5 rounded-lg p-4 border border-white/10">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-gray-400 text-sm">Accuracy</span>
+                                <i class="fas fa-bullseye text-blue-400"></i>
+                            </div>
+                            <div class="text-2xl font-bold text-white" id="metricAccuracy">--</div>
+                            <div class="text-xs text-gray-500 mt-1">Overall correctness</div>
+                        </div>
+                        
+                        <!-- Precision Card -->
+                        <div class="bg-white/5 rounded-lg p-4 border border-white/10">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-gray-400 text-sm">Precision</span>
+                                <i class="fas fa-crosshairs text-green-400"></i>
+                            </div>
+                            <div class="text-2xl font-bold text-white" id="metricPrecision">--</div>
+                            <div class="text-xs text-gray-500 mt-1">Positive pred. accuracy</div>
+                        </div>
+                        
+                        <!-- Recall Card -->
+                        <div class="bg-white/5 rounded-lg p-4 border border-white/10">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-gray-400 text-sm">Recall</span>
+                                <i class="fas fa-filter text-yellow-400"></i>
+                            </div>
+                            <div class="text-2xl font-bold text-white" id="metricRecall">--</div>
+                            <div class="text-xs text-gray-500 mt-1">True positive rate</div>
+                        </div>
+                        
+                        <!-- F1-Score Card -->
+                        <div class="bg-white/5 rounded-lg p-4 border border-white/10">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-gray-400 text-sm">F1-Score</span>
+                                <i class="fas fa-balance-scale text-purple-400"></i>
+                            </div>
+                            <div class="text-2xl font-bold text-white" id="metricF1">--</div>
+                            <div class="text-xs text-gray-500 mt-1">Harmonic mean</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Confusion Matrix and Additional Info -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Confusion Matrix -->
+                        <div>
+                            <h4 class="text-lg font-semibold text-white mb-3">
+                                <i class="fas fa-th mr-2"></i>Confusion Matrix
+                            </h4>
+                            <div class="bg-white/5 rounded-lg p-4 border border-white/10">
+                                <table class="w-full text-center">
+                                    <thead>
+                                        <tr>
+                                            <th class="p-2"></th>
+                                            <th class="p-2 text-gray-400 text-sm">Predicted REAL</th>
+                                            <th class="p-2 text-gray-400 text-sm">Predicted FAKE</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td class="p-2 text-gray-400 text-sm font-semibold">Actually REAL</td>
+                                            <td class="p-2">
+                                                <div class="bg-green-500/20 border-2 border-green-500 rounded-lg p-3">
+                                                    <div class="text-2xl font-bold text-green-400" id="cmTrueNegative">0</div>
+                                                    <div class="text-xs text-gray-400">True Negative</div>
+                                                </div>
+                                            </td>
+                                            <td class="p-2">
+                                                <div class="bg-red-500/20 border-2 border-red-500 rounded-lg p-3">
+                                                    <div class="text-2xl font-bold text-red-400" id="cmFalsePositive">0</div>
+                                                    <div class="text-xs text-gray-400">False Positive</div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="p-2 text-gray-400 text-sm font-semibold">Actually FAKE</td>
+                                            <td class="p-2">
+                                                <div class="bg-red-500/20 border-2 border-red-500 rounded-lg p-3">
+                                                    <div class="text-2xl font-bold text-red-400" id="cmFalseNegative">0</div>
+                                                    <div class="text-xs text-gray-400">False Negative</div>
+                                                </div>
+                                            </td>
+                                            <td class="p-2">
+                                                <div class="bg-green-500/20 border-2 border-green-500 rounded-lg p-3">
+                                                    <div class="text-2xl font-bold text-green-400" id="cmTruePositive">0</div>
+                                                    <div class="text-xs text-gray-400">True Positive</div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        
+                        <!-- Model Information -->
+                        <div>
+                            <h4 class="text-lg font-semibold text-white mb-3">
+                                <i class="fas fa-info-circle mr-2"></i>Model Information
+                            </h4>
+                            <div class="bg-white/5 rounded-lg p-4 border border-white/10 space-y-3">
+                                <div class="flex justify-between items-center">
+                                    <span class="text-gray-400">Model Type:</span>
+                                    <span class="text-white font-semibold">Logistic Regression</span>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-gray-400">Vectorizer:</span>
+                                    <span class="text-white font-semibold">TF-IDF</span>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-gray-400">Training Samples:</span>
+                                    <span class="text-white font-semibold" id="trainSize">--</span>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-gray-400">Testing Samples:</span>
+                                    <span class="text-white font-semibold" id="testSize">--</span>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-gray-400">Training Accuracy:</span>
+                                    <span class="text-white font-semibold" id="trainAccuracy">--</span>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-gray-400">Last Trained:</span>
+                                    <span class="text-white font-semibold text-sm" id="trainedDate">--</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Model Training Section -->
+            <div class="glass-card p-6 mb-8">
+                <h3 class="text-xl font-bold text-white mb-4">
+                    <i class="fas fa-cogs mr-2"></i>Model Training Control
+                </h3>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Training Control -->
+                    <div>
+                        <h4 class="text-lg font-semibold text-white mb-3">
+                            <i class="fas fa-play-circle mr-2"></i>Train Model
+                        </h4>
+                        <div class="bg-white/5 rounded-lg p-4 border border-white/10">
+                            <!-- Dataset Upload -->
+                            <div class="mb-4 pb-4 border-b border-white/10">
+                                <label class="block text-gray-300 text-sm mb-2">
+                                    <i class="fas fa-upload mr-1"></i>Upload Training Dataset (Optional)
+                                </label>
+                                <input type="file" id="datasetFile" accept=".csv" 
+                                       class="hidden" onchange="handleFileSelect(event)">
+                                <button onclick="document.getElementById('datasetFile').click()" 
+                                        class="w-full bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-lg text-sm transition duration-300 mb-2">
+                                    <i class="fas fa-file-csv mr-2"></i>Choose CSV File
+                                </button>
+                                <div id="fileInfo" class="text-xs text-gray-400 hidden">
+                                    <i class="fas fa-check-circle text-green-400 mr-1"></i>
+                                    <span id="fileName"></span>
+                                </div>
+                                <button id="uploadButton" onclick="uploadDataset()" 
+                                        class="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm transition duration-300 hidden">
+                                    <i class="fas fa-cloud-upload-alt mr-2"></i>Upload Dataset
+                                </button>
+                                <div class="text-xs text-gray-500 mt-2">
+                                    CSV must have "text" and "label" columns (0=REAL, 1=FAKE)
+                                </div>
+                            </div>
+                            
+                            <p class="text-gray-300 mb-4 text-sm">
+                                Retrain the fake news detection model with the latest dataset. 
+                                This process may take a few minutes.
+                            </p>
+                            
+                            <div class="space-y-3">
+                                <button id="trainButton" onclick="startTraining()" 
+                                        class="w-full bg-gradient-to-r from-primary to-secondary text-white px-6 py-3 rounded-lg font-semibold hover:shadow-lg transition duration-300">
+                                    <i class="fas fa-brain mr-2"></i>Start Training
+                                </button>
+                                
+                                <div class="text-xs text-gray-400">
+                                    <i class="fas fa-info-circle mr-1"></i>
+                                    Note: If no custom dataset is found, a sample dataset will be used for demonstration.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Training Status -->
+                    <div>
+                        <h4 class="text-lg font-semibold text-white mb-3">
+                            <i class="fas fa-tasks mr-2"></i>Training Status
+                        </h4>
+                        <div class="bg-white/5 rounded-lg p-4 border border-white/10">
+                            <div class="space-y-3">
+                                <div class="flex justify-between items-center">
+                                    <span class="text-gray-400 text-sm">Status:</span>
+                                    <span id="trainingStatus" class="text-white font-semibold">Idle</span>
+                                </div>
+                                
+                                <div class="flex justify-between items-center">
+                                    <span class="text-gray-400 text-sm">Progress:</span>
+                                    <span id="trainingProgress" class="text-white font-semibold">0%</span>
+                                </div>
+                                
+                                <div>
+                                    <div class="w-full bg-white/10 rounded-full h-2">
+                                        <div id="trainingProgressBar" class="bg-gradient-to-r from-primary to-secondary h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
+                                    </div>
+                                </div>
+                                
+                                <div>
+                                    <p id="trainingMessage" class="text-gray-300 text-sm">
+                                        <i class="fas fa-info-circle mr-1"></i>No training in progress
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Training History/Results -->
+                <div id="trainingResults" class="mt-6 hidden">
+                    <h4 class="text-lg font-semibold text-white mb-3">
+                        <i class="fas fa-check-circle mr-2"></i>Training Completed
+                    </h4>
+                    <div class="bg-green-500/10 border border-green-500/30 rounded-lg p-4">
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+                            <div>
+                                <div class="text-gray-400 text-xs mb-1">Test Accuracy</div>
+                                <div id="resultAccuracy" class="text-green-400 font-bold text-lg">--</div>
+                            </div>
+                            <div>
+                                <div class="text-gray-400 text-xs mb-1">Precision</div>
+                                <div id="resultPrecision" class="text-green-400 font-bold text-lg">--</div>
+                            </div>
+                            <div>
+                                <div class="text-gray-400 text-xs mb-1">Recall</div>
+                                <div id="resultRecall" class="text-green-400 font-bold text-lg">--</div>
+                            </div>
+                            <div>
+                                <div class="text-gray-400 text-xs mb-1">F1-Score</div>
+                                <div id="resultF1" class="text-green-400 font-bold text-lg">--</div>
+                            </div>
+                        </div>
+                        <div class="mt-3 text-center">
+                            <button onclick="location.reload()" class="text-primary hover:text-blue-300 text-sm">
+                                <i class="fas fa-sync-alt mr-1"></i>Refresh Dashboard to See Updated Metrics
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Training Error -->
+                <div id="trainingError" class="mt-6 hidden">
+                    <div class="bg-red-500/10 border border-red-500/30 rounded-lg p-4">
+                        <div class="flex items-start">
+                            <i class="fas fa-exclamation-triangle text-red-400 mr-3 mt-1"></i>
+                            <div>
+                                <h4 class="text-red-400 font-semibold mb-1">Training Failed</h4>
+                                <p id="trainingErrorMessage" class="text-gray-300 text-sm">An error occurred during training.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Registered Users Section -->
+            <div class="glass-card p-6 mb-8">
+                <h3 class="text-xl font-bold text-white mb-4">
+                    <i class="fas fa-users mr-2"></i>Registered Users
+                </h3>
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead>
+                            <tr class="border-b border-white/10">
+                                <th class="text-left text-gray-400 font-semibold py-3 px-2">Username</th>
+                                <th class="text-left text-gray-400 font-semibold py-3 px-2">Email</th>
+                                <th class="text-left text-gray-400 font-semibold py-3 px-2">Role</th>
+                                <th class="text-left text-gray-400 font-semibold py-3 px-2">Searches</th>
+                                <th class="text-left text-gray-400 font-semibold py-3 px-2">Registered</th>
+                                <th class="text-left text-gray-400 font-semibold py-3 px-2">Last Login</th>
+                                <th class="text-left text-gray-400 font-semibold py-3 px-2">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="usersTable">
+                            <!-- Table rows will be populated by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- User Search History Section -->
+            <div class="glass-card p-6">
+                <h3 class="text-xl font-bold text-white mb-4">
+                    <i class="fas fa-search mr-2"></i>User Search History
+                </h3>
+                <div class="mb-4">
+                    <label class="text-gray-300 text-sm mb-2 block">Filter by User:</label>
+                    <select id="userFilter" class="glass-input p-2 text-white rounded-lg w-64" onchange="filterSearchHistory()">
+                        <option value="">All Users</option>
+                    </select>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead>
+                            <tr class="border-b border-white/10">
+                                <th class="text-left text-gray-400 font-semibold py-3 px-2">User</th>
+                                <th class="text-left text-gray-400 font-semibold py-3 px-2">Search Query</th>
+                                <th class="text-left text-gray-400 font-semibold py-3 px-2">URL</th>
+                                <th class="text-left text-gray-400 font-semibold py-3 px-2">Result</th>
+                                <th class="text-left text-gray-400 font-semibold py-3 px-2">Confidence</th>
+                                <th class="text-left text-gray-400 font-semibold py-3 px-2">Date/Time</th>
+                            </tr>
+                        </thead>
+                        <tbody id="searchHistoryTable">
+                            <!-- Table rows will be populated by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="text-center text-gray-400 py-8 mt-16">
+        <p>&copy; 2026 TruthLens AI. Empowered by Machine Learning.</p>
+    </footer>
+
+    <!-- JavaScript -->
+    <script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+</body>
+</html>

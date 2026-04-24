@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TruthLens AI - Real-Time Fake News Detector</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#6366f1',
+                        secondary: '#8b5cf6',
+                        accent: '#ec4899',
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 min-h-screen">
+    
+    <!-- Navigation -->
+    <nav class="glass-nav fixed w-full top-0 z-50">
+        <div class="container mx-auto px-6 py-4">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center space-x-3">
+                    <i class="fas fa-shield-alt text-3xl text-primary"></i>
+                    <h1 class="text-2xl font-bold text-white">TruthLens AI</h1>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <a href="/" class="nav-link text-white hover:text-primary transition duration-300">
+                        <i class="fas fa-home mr-2"></i>Home
+                    </a>
+                    <div id="authButtons" class="flex space-x-3">
+                        <a href="/login" class="nav-link bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-lg transition duration-300">
+                            <i class="fas fa-sign-in-alt mr-2"></i>Login
+                        </a>
+                        <a href="/register" class="nav-link bg-gradient-to-r from-primary to-secondary text-white px-4 py-2 rounded-lg hover:shadow-lg transition duration-300">
+                            <i class="fas fa-user-plus mr-2"></i>Register
+                        </a>
+                    </div>
+                    <div id="userMenu" class="hidden flex items-center space-x-3">
+                        <span class="text-white">
+                            <i class="fas fa-user-circle mr-2"></i>
+                            <span id="loggedUsername"></span>
+                        </span>
+                        <a id="dashboardLink" href="/dashboard" class="nav-link text-white hover:text-primary transition duration-300 hidden">
+                            <i class="fas fa-chart-line mr-2"></i>Dashboard
+                        </a>
+                        <button onclick="logoutUser()" class="nav-link text-white hover:text-red-400 transition duration-300">
+                            <i class="fas fa-sign-out-alt mr-2"></i>Logout
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <div class="container mx-auto px-6 pt-32 pb-12">
+        <div class="text-center mb-12 animate-fade-in">
+            <div class="inline-block mb-6">
+                <div class="relative">
+                    <i class="fas fa-shield-alt text-7xl gradient-text floating"></i>
+                    <div class="absolute -inset-4 bg-gradient-to-r from-primary via-secondary to-accent rounded-full blur-2xl opacity-30 animate-glow"></div>
+                </div>
+            </div>
+            <h2 class="text-6xl font-bold text-white mb-6 neon-glow">
+                Detect Fake News with AI
+            </h2>
+            <p class="text-2xl text-gray-300 mb-3 animate-slide-up">
+                Powered by <span class="gradient-text font-bold">Machine Learning</span> & <span class="gradient-text font-bold">Natural Language Processing</span>
+            </p>
+            <p class="text-lg text-gray-400 animate-slide-up" style="animation-delay: 0.2s;">
+                Analyze news articles instantly with our advanced AI technology
+            </p>
+            <div class="flex justify-center gap-2 mt-6">
+                <div class="w-3 h-3 rounded-full bg-primary pulse-dot"></div>
+                <div class="w-3 h-3 rounded-full bg-secondary pulse-dot" style="animation-delay: 0.2s;"></div>
+                <div class="w-3 h-3 rounded-full bg-accent pulse-dot" style="animation-delay: 0.4s;"></div>
+            </div>
+        </div>
+
+        <!-- Main Card -->
+        <div class="max-w-4xl mx-auto">
+            <div class="glass-card p-8 animate-slide-up">
+                
+                <!-- Input Type Selector -->
+                <div class="flex justify-center space-x-4 mb-6">
+                    <button id="textBtn" class="input-type-btn active" onclick="switchInputType('text')">
+                        <i class="fas fa-file-alt mr-2"></i>Paste Text
+                    </button>
+                    <button id="urlBtn" class="input-type-btn" onclick="switchInputType('url')">
+                        <i class="fas fa-link mr-2"></i>Enter URL
+                    </button>
+                </div>
+
+                <!-- Text Input -->
+                <div id="textInput" class="input-section">
+                    <label class="block text-white text-lg font-semibold mb-3">
+                        <i class="fas fa-newspaper mr-2"></i>Paste News Article Text
+                    </label>
+                    <textarea 
+                        id="newsText" 
+                        rows="8" 
+                        class="glass-input w-full p-4 text-white rounded-xl focus:ring-2 focus:ring-primary transition duration-300"
+                        placeholder="Paste the news article text here... (minimum 50 characters)"
+                    ></textarea>
+                    <p class="text-gray-400 text-sm mt-2">
+                        <i class="fas fa-info-circle mr-1"></i>
+                        <span id="charCount">0</span> characters
+                    </p>
+                </div>
+
+                <!-- URL Input -->
+                <div id="urlInput" class="input-section hidden">
+                    <label class="block text-white text-lg font-semibold mb-3">
+                        <i class="fas fa-globe mr-2"></i>Enter News Article URL
+                    </label>
+                    <input 
+                        type="url" 
+                        id="newsUrl" 
+                        class="glass-input w-full p-4 text-white rounded-xl focus:ring-2 focus:ring-primary transition duration-300"
+                        placeholder="https://example.com/news-article"
+                    />
+                    <p class="text-gray-400 text-sm mt-2">
+                        <i class="fas fa-info-circle mr-1"></i>
+                        We'll automatically extract the article content
+                    </p>
+                </div>
+
+                <!-- Analyze Button -->
+                <div class="mt-6">
+                    <div id="loginNotice" class="bg-yellow-500/10 border border-yellow-500/30 rounded-lg p-4 mb-4">
+                        <p class="text-yellow-300 text-center">
+                            <i class="fas fa-lock mr-2"></i>
+                            <strong>Login Required:</strong> You must be logged in to analyze news articles.
+                            <a href="/login" class="underline hover:text-yellow-100">Login here</a> or 
+                            <a href="/register" class="underline hover:text-yellow-100">Register</a>
+                        </p>
+                    </div>
+                    <button 
+                        id="analyzeBtn" 
+                        onclick="analyzeNews()"
+                        class="analyze-btn ripple w-full text-white font-bold py-5 px-8 rounded-xl hover:shadow-2xl transform transition duration-300 text-lg relative overflow-hidden"
+                    >
+                        <span class="relative z-10 flex items-center justify-center">
+                            <i class="fas fa-brain mr-3 icon-glow"></i>
+                            <span>Analyze with AI</span>
+                            <i class="fas fa-arrow-right ml-3 icon-glow"></i>
+                        </span>
+                    </button>
+                </div>
+
+                <!-- Loading Indicator -->
+                <div id="loadingIndicator" class="loading-indicator hidden mt-6">
+                    <div class="flex flex-col items-center justify-center space-y-4">
+                        <div class="spinner"></div>
+                        <span class="text-white text-lg font-semibold animate-pulse">Analyzing with AI...</span>
+                        <p class="text-gray-400 text-sm">Processing natural language patterns</p>
+                    </div>
+                </div>
+
+                <!-- Error Message -->
+                <div id="errorMessage" class="error-message hidden mt-6">
+                    <div class="bg-red-500/20 border-2 border-red-500 rounded-xl p-5 hover-lift">
+                        <p class="text-red-300 flex items-start">
+                            <i class="fas fa-exclamation-triangle mr-3 mt-1 text-xl icon-glow"></i>
+                            <span id="errorText" class="flex-1"></span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <!-- Results Card -->
+            <div id="resultsCard" class="glass-card p-8 mt-8 hidden animate-slide-up hover-lift">
+                
+                <!-- Prediction Result -->
+                <div id="predictionResult" class="text-center mb-8 relative">
+                    <div class="absolute inset-0 bg-gradient-to-r from-primary/10 via-secondary/10 to-accent/10 rounded-2xl blur-3xl"></div>
+                    <h3 class="text-3xl font-bold text-white mb-6 gradient-text relative z-10">
+                        <i class="fas fa-chart-pie mr-3 icon-glow"></i>Analysis Result
+                    </h3>
+                    <div id="predictionBadge" class="inline-block px-10 py-5 rounded-3xl text-4xl font-extrabold mb-6 relative z-10 hover-lift"></div>
+                    <div class="flex justify-center items-center space-x-12 mt-6 relative z-10">
+                        <div class="text-center hover-lift">
+                            <p class="text-gray-400 text-sm mb-3 uppercase tracking-wide">Confidence</p>
+                            <p id="confidenceText" class="text-5xl font-extrabold text-white" data-tooltip="AI prediction confidence level"></p>
+                            <div class="mt-2 w-full h-1 bg-gradient-to-r from-primary via-secondary to-accent rounded-full"></div>
+                        </div>
+                        <div class="h-16 w-px bg-gradient-to-b from-transparent via-white/20 to-transparent"></div>
+                        <div class="text-center hover-lift">
+                            <p class="text-gray-400 text-sm mb-3 uppercase tracking-wide">Sentiment</p>
+                            <p id="sentimentText" class="text-3xl font-extrabold"></p>
+                            <div class="mt-2 w-full h-1 bg-gradient-to-r from-primary via-secondary to-accent rounded-full"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Detailed Analysis -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                    
+                    <!-- Probability Bars -->
+                    <div class="stat-card p-6 rounded-xl hover-lift">
+                        <h4 class="text-white font-semibold mb-4 flex items-center">
+                            <i class="fas fa-chart-bar mr-2 icon-glow text-primary"></i>Probability Distribution
+                        </h4>
+                        <div class="space-y-5">
+                            <div>
+                                <div class="flex justify-between text-sm text-gray-300 mb-3 font-semibold">
+                                    <span class="flex items-center">
+                                        <span class="w-3 h-3 rounded-full bg-red-500 mr-2 pulse-dot"></span>
+                                        Fake News
+                                    </span>
+                                    <span id="fakeProbText" class="text-red-400 font-bold">0%</span>
+                                </div>
+                                <div class="progress-bar">
+                                    <div id="fakeProbBar" class="progress-bar-fill bg-gradient-to-r from-red-600 to-red-400"></div>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="flex justify-between text-sm text-gray-300 mb-3 font-semibold">
+                                    <span class="flex items-center">
+                                        <span class="w-3 h-3 rounded-full bg-green-500 mr-2 pulse-dot" style="animation-delay: 0.5s;"></span>
+                                        Real News
+                                    </span>
+                                    <span id="realProbText" class="text-green-400 font-bold">0%</span>
+                                </div>
+                                <div class="progress-bar">
+                                    <div id="realProbBar" class="progress-bar-fill bg-gradient-to-r from-green-600 to-green-400"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Sentiment Analysis -->
+                    <div class="stat-card p-6 rounded-xl hover-lift">
+                        <h4 class="text-white font-semibold mb-4 flex items-center">
+                            <i class="fas fa-smile mr-2 icon-glow text-secondary"></i>Sentiment Details
+                        </h4>
+                        <div class="space-y-4">
+                            <div class="flex justify-between items-center p-3 bg-white/5 rounded-lg hover:bg-white/10 transition">
+                                <span class="text-gray-300 flex items-center">
+                                    <i class="fas fa-tag mr-2 text-primary"></i>Category
+                                </span>
+                                <span id="sentimentCategory" class="text-white font-bold badge"></span>
+                            </div>
+                            <div class="flex justify-between items-center p-3 bg-white/5 rounded-lg hover:bg-white/10 transition">
+                                <span class="text-gray-300 flex items-center">
+                                    <i class="fas fa-thermometer-half mr-2 text-primary"></i>Polarity
+                                </span>
+                                <span id="polarityScore" class="text-white font-bold"></span>
+                            </div>
+                            <div class="flex justify-between items-center p-3 bg-white/5 rounded-lg hover:bg-white/10 transition">
+                                <span class="text-gray-300 flex items-center">
+                                    <i class="fas fa-balance-scale mr-2 text-primary"></i>Subjectivity
+                                </span>
+                                <span id="subjectivityScore" class="text-white font-bold"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Text Preview -->
+                <div class="stat-card p-6 rounded-xl hover-lift">
+                    <h4 class="text-white font-semibold mb-4 flex items-center">
+                        <i class="fas fa-align-left mr-2 icon-glow text-accent"></i>Analyzed Text
+                    </h4>
+                    <div class="bg-white/5 p-4 rounded-lg border-l-4 border-primary">
+                        <p id="textPreview" class="text-gray-300 text-sm leading-relaxed"></p>
+                    </div>
+                </div>
+
+                <!-- Explainable AI - Influential Words -->
+                <div id="influentialWordsSection" class="stat-card p-6 rounded-xl hover-lift">
+                    <h4 class="text-white font-semibold mb-4 flex items-center">
+                        <i class="fas fa-lightbulb mr-2 icon-glow text-yellow-400"></i>Explainable AI (Influential Words)
+                    </h4>
+                    <p class="text-gray-400 text-sm mb-3">
+                        Words highlighted below contributed most to the "<span id="influentialWordsPrediction" class="font-bold"></span>" prediction:
+                    </p>
+                    <div id="influentialWordsContainer" class="bg-white/5 p-4 rounded-lg border-l-4 border-yellow-400">
+                        <div id="influentialWordsList" class="flex flex-wrap gap-2"></div>
+                    </div>
+                    <p class="text-gray-500 text-xs mt-3 italic">
+                        <i class="fas fa-info-circle mr-1"></i>
+                        Larger badges indicate stronger influence on the prediction
+                    </p>
+                </div>
+
+                <!-- Processing Info -->
+                <div class="text-center mt-6 p-4 bg-gradient-to-r from-primary/10 to-secondary/10 rounded-lg border border-white/10">
+                    <p class="text-gray-400 text-sm flex items-center justify-center flex-wrap gap-2">
+                        <i class="fas fa-clock icon-glow"></i>
+                        <span>Processed in <span id="processingTime" class="font-bold text-primary">0.00</span> seconds</span>
+                        <span class="text-gray-600">•</span>
+                        <i class="fas fa-check-circle icon-glow text-green-400"></i>
+                        <span class="font-semibold text-green-400">AI Verified</span>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Features Section -->
+    <div id="features" class="container mx-auto px-6 py-16">
+        <h3 class="text-4xl font-bold text-center text-white mb-12 gradient-text">
+            <i class="fas fa-star mr-3 icon-glow"></i>Key Features
+        </h3>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div class="glass-card p-8 text-center feature-card">
+                <div class="w-20 h-20 mx-auto mb-6 rounded-full bg-gradient-to-r from-primary to-secondary flex items-center justify-center animate-glow">
+                    <i class="fas fa-brain text-4xl text-white"></i>
+                </div>
+                <h4 class="text-xl font-bold text-white mb-3">AI-Powered Analysis</h4>
+                <p class="text-gray-300 leading-relaxed">Advanced machine learning algorithms analyze text patterns to detect misinformation</p>
+            </div>
+            <div class="glass-card p-8 text-center feature-card" style="animation-delay: 0.1s;">
+                <div class="w-20 h-20 mx-auto mb-6 rounded-full bg-gradient-to-r from-secondary to-accent flex items-center justify-center animate-glow" style="animation-delay: 0.3s;">
+                    <i class="fas fa-bolt text-4xl text-white"></i>
+                </div>
+                <h4 class="text-xl font-bold text-white mb-3">Instant Results</h4>
+                <p class="text-gray-300 leading-relaxed">Get real-time predictions with confidence scores and detailed sentiment analysis</p>
+            </div>
+            <div class="glass-card p-8 text-center feature-card" style="animation-delay: 0.2s;">
+                <div class="w-20 h-20 mx-auto mb-6 rounded-full bg-gradient-to-r from-accent to-primary flex items-center justify-center animate-glow" style="animation-delay: 0.6s;">
+                    <i class="fas fa-shield-check text-4xl text-white"></i>
+                </div>
+                <h4 class="text-xl font-bold text-white mb-3">Verified Accuracy</h4>
+                <p class="text-gray-300 leading-relaxed">Trained on thousands of articles with high precision and recall metrics</p>
+            </div>
+        </div>
+    </div>
+                    <i class="fas fa-clock mr-2"></i>
+                    Processing time: <span id="processingTime" class="font-semibold">0</span>s
+                </div>
+
+                <!-- Analyze Another Button -->
+                <button 
+                    onclick="resetAnalysis()"
+                    class="w-full mt-6 bg-white/10 hover:bg-white/20 text-white font-semibold py-3 px-6 rounded-xl transition duration-300"
+                >
+                    <i class="fas fa-redo mr-2"></i>Analyze Another Article
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Enhanced Footer -->
+    <footer class="mt-20 py-12 border-t border-white/10">
+        <div class="container mx-auto px-6">
+            <div class="max-w-6xl mx-auto">
+                <!-- Footer Content -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
+                    <!-- Brand Section -->
+                    <div class="text-center md:text-left">
+                        <h3 class="text-2xl font-bold text-white mb-3 gradient-text">
+                            <i class="fas fa-shield-alt mr-2 icon-glow"></i>TruthLens AI
+                        </h3>
+                        <p class="text-gray-400 text-sm leading-relaxed">
+                            Empowering truth through advanced machine learning and artificial intelligence.
+                        </p>
+                    </div>
+                    
+                    <!-- Quick Links -->
+                    <div class="text-center">
+                        <h4 class="text-white font-semibold mb-3">Quick Links</h4>
+                        <ul class="space-y-2 text-sm">
+                            <li><a href="#" class="text-gray-400 hover:text-primary transition duration-300"><i class="fas fa-home mr-2"></i>Home</a></li>
+                            <li><a href="#features" class="text-gray-400 hover:text-primary transition duration-300"><i class="fas fa-star mr-2"></i>Features</a></li>
+                            <li><a href="/login" class="text-gray-400 hover:text-primary transition duration-300"><i class="fas fa-sign-in-alt mr-2"></i>Login</a></li>
+                            <li><a href="/register" class="text-gray-400 hover:text-primary transition duration-300"><i class="fas fa-user-plus mr-2"></i>Register</a></li>
+                        </ul>
+                    </div>
+                    
+                    <!-- Technology Stack -->
+                    <div class="text-center md:text-right">
+                        <h4 class="text-white font-semibold mb-3">Built With</h4>
+                        <div class="flex flex-wrap justify-center md:justify-end gap-3 text-sm">
+                            <span class="px-3 py-1 rounded-full bg-white/10 text-gray-300 hover:bg-white/20 transition duration-300">
+                                <i class="fab fa-python mr-1"></i>Flask
+                            </span>
+                            <span class="px-3 py-1 rounded-full bg-white/10 text-gray-300 hover:bg-white/20 transition duration-300">
+                                <i class="fas fa-brain mr-1"></i>Scikit-learn
+                            </span>
+                            <span class="px-3 py-1 rounded-full bg-white/10 text-gray-300 hover:bg-white/20 transition duration-300">
+                                <i class="fab fa-css3-alt mr-1"></i>Tailwind CSS
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Copyright -->
+                <div class="text-center pt-8 border-t border-white/10">
+                    <p class="text-gray-400 text-sm">
+                        <i class="far fa-copyright mr-1"></i>2026 TruthLens AI. All rights reserved. Powered by Machine Learning.
+                    </p>
+                    <p class="text-gray-500 text-xs mt-2">
+                        <i class="fas fa-shield-check mr-1 text-primary"></i>Combating misinformation, one article at a time.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript -->
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <script>
+        // Check authentication status on page load
+        async function checkAuth() {
+            try {
+                const response = await fetch('/api/check-auth');
+                const data = await response.json();
+                
+                if (data.authenticated) {
+                    document.getElementById('authButtons').classList.add('hidden');
+                    document.getElementById('userMenu').classList.remove('hidden');
+                    document.getElementById('loggedUsername').textContent = data.username;
+                    
+                    // Hide login notice for authenticated users
+                    document.getElementById('loginNotice').classList.add('hidden');
+                    
+                    // Show dashboard link only for admin users
+                    if (data.is_admin) {
+                        document.getElementById('dashboardLink').classList.remove('hidden');
+                    } else {
+                        document.getElementById('dashboardLink').classList.add('hidden');
+                    }
+                } else {
+                    document.getElementById('authButtons').classList.remove('hidden');
+                    document.getElementById('userMenu').classList.add('hidden');
+                    
+                    // Show login notice for non-authenticated users
+                    document.getElementById('loginNotice').classList.remove('hidden');
+                }
+            } catch (error) {
+                console.error('Auth check failed:', error);
+            }
+        }
+        
+        // Logout function
+        async function logoutUser() {
+            try {
+                const response = await fetch('/api/logout', { method: 'POST' });
+                if (response.ok) {
+                    window.location.reload();
+                }
+            } catch (error) {
+                console.error('Logout failed:', error);
+            }
+        }
+        
+        // Check auth on page load
+        checkAuth();
+    </script>
+</body>
+</html>

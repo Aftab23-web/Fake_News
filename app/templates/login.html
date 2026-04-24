@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - TruthLens AI</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#6366f1',
+                        secondary: '#8b5cf6',
+                        accent: '#ec4899',
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 min-h-screen flex items-center justify-center">
+    
+    <!-- Login Card -->
+    <div class="container mx-auto px-6">
+        <div class="max-w-md mx-auto">
+            
+            <!-- Logo and Title -->
+            <div class="text-center mb-8 animate-fade-in">
+                <div class="inline-block mb-4">
+                    <i class="fas fa-shield-alt text-6xl text-primary"></i>
+                </div>
+                <h1 class="text-4xl font-bold text-white mb-2">TruthLens AI</h1>
+                <p class="text-gray-300">Sign in to your account</p>
+            </div>
+
+            <!-- Login Form Card -->
+            <div class="glass-card p-8 animate-slide-up">
+                <form id="loginForm" onsubmit="handleLogin(event)">
+                    
+                    <!-- Username Field -->
+                    <div class="mb-6">
+                        <label class="block text-white text-sm font-semibold mb-2" for="username">
+                            <i class="fas fa-user mr-2"></i>Username
+                        </label>
+                        <input 
+                            type="text" 
+                            id="username" 
+                            name="username" 
+                            class="glass-input w-full p-3 text-white rounded-lg focus:ring-2 focus:ring-primary transition duration-300" 
+                            placeholder="Enter username"
+                            required
+                        />
+                    </div>
+
+                    <!-- Password Field -->
+                    <div class="mb-6">
+                        <label class="block text-white text-sm font-semibold mb-2" for="password">
+                            <i class="fas fa-lock mr-2"></i>Password
+                        </label>
+                        <div class="relative">
+                            <input 
+                                type="password" 
+                                id="password" 
+                                name="password" 
+                                class="glass-input w-full p-3 text-white rounded-lg focus:ring-2 focus:ring-primary transition duration-300" 
+                                placeholder="Enter password"
+                                required
+                            />
+                            <button 
+                                type="button" 
+                                onclick="togglePassword()"
+                                class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white transition duration-300"
+                            >
+                                <i id="toggleIcon" class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Error Message -->
+                    <div id="errorMessage" class="error-message hidden mb-4">
+                        <div class="bg-red-500/20 border-2 border-red-500 rounded-lg p-3">
+                            <p class="text-red-300 text-sm">
+                                <i class="fas fa-exclamation-triangle mr-2"></i>
+                                <span id="errorText"></span>
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Success Message -->
+                    <div id="successMessage" class="success-message hidden mb-4">
+                        <div class="bg-green-500/20 border-2 border-green-500 rounded-lg p-3">
+                            <p class="text-green-300 text-sm">
+                                <i class="fas fa-check-circle mr-2"></i>
+                                <span id="successText"></span>
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Login Button -->
+                    <button 
+                        type="submit" 
+                        id="loginBtn"
+                        class="w-full bg-gradient-to-r from-primary to-secondary text-white font-bold py-3 px-6 rounded-lg hover:shadow-2xl transform hover:scale-105 transition duration-300"
+                    >
+                        <i class="fas fa-sign-in-alt mr-2"></i>Login
+                    </button>
+                </form>
+
+                <!-- Loading Indicator -->
+                <div id="loadingIndicator" class="loading-indicator hidden mt-4">
+                    <div class="flex items-center justify-center space-x-3">
+                        <div class="spinner"></div>
+                        <span class="text-white">Logging in...</span>
+                    </div>
+                </div>
+
+                <!-- Register Link -->
+                <div class="text-center mt-6">
+                    <p class="text-gray-400">
+                        Don't have an account?
+                        <a href="/register" class="text-primary hover:text-secondary font-semibold transition duration-300">
+                            Register here
+                        </a>
+                    </p>
+                </div>
+
+                <!-- Back to Home -->
+                <div class="text-center mt-4">
+                    <a href="/" class="text-gray-400 hover:text-white transition duration-300">
+                        <i class="fas fa-arrow-left mr-2"></i>Back to Home
+                    </a>
+                </div>
+            </div>
+
+            <!-- Info Card -->
+            <div class="glass-card p-4 mt-6 animate-slide-up" style="animation-delay: 0.2s">
+                <p class="text-gray-300 text-sm text-center">
+                    <i class="fas fa-info-circle mr-2"></i>
+                    New users can register to save their analysis history
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script>
+        // Toggle password visibility
+        function togglePassword() {
+            const passwordInput = document.getElementById('password');
+            const toggleIcon = document.getElementById('toggleIcon');
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                toggleIcon.classList.remove('fa-eye');
+                toggleIcon.classList.add('fa-eye-slash');
+            } else {
+                passwordInput.type = 'password';
+                toggleIcon.classList.remove('fa-eye-slash');
+                toggleIcon.classList.add('fa-eye');
+            }
+        }
+
+        // Handle login form submission
+        async function handleLogin(event) {
+            event.preventDefault();
+            
+            const loginBtn = document.getElementById('loginBtn');
+            const loadingIndicator = document.getElementById('loadingIndicator');
+            const errorMessage = document.getElementById('errorMessage');
+            const successMessage = document.getElementById('successMessage');
+            
+            // Get form data
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            
+            // Show loading
+            loginBtn.disabled = true;
+            loadingIndicator.classList.remove('hidden');
+            errorMessage.classList.add('hidden');
+            successMessage.classList.add('hidden');
+            
+            try {
+                // Send login request
+                const response = await fetch('/api/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ username, password })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok && data.success) {
+                    // Show success message
+                    document.getElementById('successText').textContent = 'Login successful! Redirecting...';
+                    successMessage.classList.remove('hidden');
+                    
+                    // Redirect based on user role
+                    setTimeout(() => {
+                        if (data.is_admin) {
+                            window.location.href = '/dashboard';
+                        } else {
+                            window.location.href = '/';
+                        }
+                    }, 1000);
+                } else {
+                    // Show error message
+                    document.getElementById('errorText').textContent = data.error || 'Login failed';
+                    errorMessage.classList.remove('hidden');
+                    loginBtn.disabled = false;
+                }
+            } catch (error) {
+                console.error('Login error:', error);
+                document.getElementById('errorText').textContent = 'Network error. Please try again.';
+                errorMessage.classList.remove('hidden');
+                loginBtn.disabled = false;
+            } finally {
+                loadingIndicator.classList.add('hidden');
+            }
+        }
+
+        // Auto-focus on username field
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('username').focus();
+        });
+    </script>
+</body>
+</html>

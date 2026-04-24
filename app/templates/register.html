@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - TruthLens AI</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#6366f1',
+                        secondary: '#8b5cf6',
+                        accent: '#ec4899',
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 min-h-screen flex items-center justify-center">
+    
+    <!-- Register Card -->
+    <div class="container mx-auto px-6">
+        <div class="max-w-md mx-auto">
+            
+            <!-- Logo and Title -->
+            <div class="text-center mb-8 animate-fade-in">
+                <div class="inline-block mb-4">
+                    <i class="fas fa-shield-alt text-6xl text-primary"></i>
+                </div>
+                <h1 class="text-4xl font-bold text-white mb-2">TruthLens AI</h1>
+                <p class="text-gray-300">Create Your Account</p>
+            </div>
+
+            <!-- Register Form Card -->
+            <div class="glass-card p-8 animate-slide-up">
+                <form id="registerForm" onsubmit="handleRegister(event)">
+                    
+                    <!-- Username Field -->
+                    <div class="mb-4">
+                        <label class="block text-white text-sm font-semibold mb-2" for="username">
+                            <i class="fas fa-user mr-2"></i>Username
+                        </label>
+                        <input 
+                            type="text" 
+                            id="username" 
+                            name="username" 
+                            class="glass-input w-full p-3 text-white rounded-lg focus:ring-2 focus:ring-primary transition duration-300" 
+                            placeholder="Choose a username"
+                            minlength="3"
+                            required
+                        />
+                        <p class="text-gray-400 text-xs mt-1">At least 3 characters</p>
+                    </div>
+
+                    <!-- Email Field -->
+                    <div class="mb-4">
+                        <label class="block text-white text-sm font-semibold mb-2" for="email">
+                            <i class="fas fa-envelope mr-2"></i>Email
+                        </label>
+                        <input 
+                            type="email" 
+                            id="email" 
+                            name="email" 
+                            class="glass-input w-full p-3 text-white rounded-lg focus:ring-2 focus:ring-primary transition duration-300" 
+                            placeholder="your@email.com"
+                            required
+                        />
+                    </div>
+
+                    <!-- Password Field -->
+                    <div class="mb-4">
+                        <label class="block text-white text-sm font-semibold mb-2" for="password">
+                            <i class="fas fa-lock mr-2"></i>Password
+                        </label>
+                        <div class="relative">
+                            <input 
+                                type="password" 
+                                id="password" 
+                                name="password" 
+                                class="glass-input w-full p-3 text-white rounded-lg focus:ring-2 focus:ring-primary transition duration-300" 
+                                placeholder="Create a strong password"
+                                minlength="6"
+                                required
+                            />
+                            <button 
+                                type="button" 
+                                onclick="togglePassword('password')"
+                                class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white transition duration-300"
+                            >
+                                <i id="passwordIcon" class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                        <p class="text-gray-400 text-xs mt-1">At least 6 characters</p>
+                    </div>
+
+                    <!-- Confirm Password Field -->
+                    <div class="mb-6">
+                        <label class="block text-white text-sm font-semibold mb-2" for="confirmPassword">
+                            <i class="fas fa-lock mr-2"></i>Confirm Password
+                        </label>
+                        <div class="relative">
+                            <input 
+                                type="password" 
+                                id="confirmPassword" 
+                                name="confirmPassword" 
+                                class="glass-input w-full p-3 text-white rounded-lg focus:ring-2 focus:ring-primary transition duration-300" 
+                                placeholder="Confirm your password"
+                                required
+                            />
+                            <button 
+                                type="button" 
+                                onclick="togglePassword('confirmPassword')"
+                                class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white transition duration-300"
+                            >
+                                <i id="confirmPasswordIcon" class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Error Message -->
+                    <div id="errorMessage" class="error-message hidden mb-4">
+                        <div class="bg-red-500/20 border-2 border-red-500 rounded-lg p-3">
+                            <p class="text-red-300 text-sm">
+                                <i class="fas fa-exclamation-triangle mr-2"></i>
+                                <span id="errorText"></span>
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Success Message -->
+                    <div id="successMessage" class="success-message hidden mb-4">
+                        <div class="bg-green-500/20 border-2 border-green-500 rounded-lg p-3">
+                            <p class="text-green-300 text-sm">
+                                <i class="fas fa-check-circle mr-2"></i>
+                                <span id="successText"></span>
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Register Button -->
+                    <button 
+                        type="submit" 
+                        id="registerBtn"
+                        class="w-full bg-gradient-to-r from-primary to-secondary text-white font-bold py-3 px-6 rounded-lg hover:shadow-2xl transform hover:scale-105 transition duration-300"
+                    >
+                        <i class="fas fa-user-plus mr-2"></i>Create Account
+                    </button>
+                </form>
+
+                <!-- Loading Indicator -->
+                <div id="loadingIndicator" class="loading-indicator hidden mt-4">
+                    <div class="flex items-center justify-center space-x-3">
+                        <div class="spinner"></div>
+                        <span class="text-white">Creating account...</span>
+                    </div>
+                </div>
+
+                <!-- Login Link -->
+                <div class="text-center mt-6">
+                    <p class="text-gray-400">
+                        Already have an account?
+                        <a href="/login" class="text-primary hover:text-secondary font-semibold transition duration-300">
+                            Login here
+                        </a>
+                    </p>
+                </div>
+
+                <!-- Back to Home -->
+                <div class="text-center mt-4">
+                    <a href="/" class="text-gray-400 hover:text-white transition duration-300">
+                        <i class="fas fa-arrow-left mr-2"></i>Back to Home
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script>
+        // Toggle password visibility
+        function togglePassword(fieldId) {
+            const passwordInput = document.getElementById(fieldId);
+            const icon = document.getElementById(fieldId + 'Icon');
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                passwordInput.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        }
+
+        // Handle registration form submission
+        async function handleRegister(event) {
+            event.preventDefault();
+            
+            const registerBtn = document.getElementById('registerBtn');
+            const loadingIndicator = document.getElementById('loadingIndicator');
+            const errorMessage = document.getElementById('errorMessage');
+            const successMessage = document.getElementById('successMessage');
+            
+            // Get form data
+            const username = document.getElementById('username').value;
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            
+            // Validate passwords match
+            if (password !== confirmPassword) {
+                document.getElementById('errorText').textContent = 'Passwords do not match';
+                errorMessage.classList.remove('hidden');
+                return;
+            }
+            
+            // Show loading
+            registerBtn.disabled = true;
+            loadingIndicator.classList.remove('hidden');
+            errorMessage.classList.add('hidden');
+            successMessage.classList.add('hidden');
+            
+            try {
+                // Send registration request
+                const response = await fetch('/api/register', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ username, email, password })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok && data.success) {
+                    // Show success message
+                    document.getElementById('successText').textContent = 'Account created successfully! Redirecting...';
+                    successMessage.classList.remove('hidden');
+                    
+                    // Redirect to home page (user is now logged in)
+                    setTimeout(() => {
+                        window.location.href = '/';
+                    }, 1500);
+                } else {
+                    // Show error message
+                    document.getElementById('errorText').textContent = data.error || 'Registration failed';
+                    errorMessage.classList.remove('hidden');
+                    registerBtn.disabled = false;
+                }
+            } catch (error) {
+                console.error('Registration error:', error);
+                document.getElementById('errorText').textContent = 'Network error. Please try again.';
+                errorMessage.classList.remove('hidden');
+                registerBtn.disabled = false;
+            } finally {
+                loadingIndicator.classList.add('hidden');
+            }
+        }
+
+        // Auto-focus on username field
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('username').focus();
+        });
+    </script>
+</body>
+</html>
