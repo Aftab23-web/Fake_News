@@ -22,7 +22,7 @@ def setup_database():
             # Create database
             print("Creating database...")
             cursor.execute("CREATE DATABASE IF NOT EXISTS truthlens_db")
-            print("✅ Database 'truthlens_db' created successfully")
+            print(" Database 'truthlens_db' created successfully")
             
             # Select database
             cursor.execute("USE truthlens_db")
@@ -46,7 +46,7 @@ def setup_database():
                     INDEX idx_username (username)
                 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
             """)
-            print("✅ Users table created")
+            print(" Users table created")
             
             # Create predictions table
             print("Creating predictions table...")
@@ -68,7 +68,7 @@ def setup_database():
                     INDEX idx_confidence (confidence)
                 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
             """)
-            print("✅ Predictions table created")
+            print(" Predictions table created")
             
             # Insert default admin user
             print("Creating admin user...")
@@ -77,7 +77,7 @@ def setup_database():
                 INSERT INTO users (username, password_hash, email, is_admin)
                 VALUES (%s, %s, %s, %s)
             """, ('admin', admin_password_hash, 'admin@truthlens.ai', True))
-            print("✅ Admin user created (username: admin, password: admin123)")
+            print(" Admin user created (username: admin, password: admin123)")
             
             # Insert sample predictions
             print("Adding sample data...")
@@ -89,13 +89,13 @@ def setup_database():
                 ('SHOCKING: Aliens found in government facility, officials refuse to comment!', 'FAKE', 94.20, 'Negative', -0.35, '127.0.0.1'),
                 ('Local community comes together to support flood victims with donations.', 'REAL', 82.15, 'Positive', 0.68, '127.0.0.1')
             ])
-            print("✅ Sample data added")
+            print(" Sample data added")
             
             # Commit changes
             connection.commit()
             
             print("\n" + "="*60)
-            print("✅ Database setup completed successfully!")
+            print(" Database setup completed successfully!")
             print("="*60)
             print("\nDatabase: truthlens_db")
             print("Admin Username: admin")
@@ -103,7 +103,7 @@ def setup_database():
             print("\nYou can now run the application with: python run.py")
             
     except Error as e:
-        print(f"❌ Error: {e}")
+        print(f" Error: {e}")
         return False
         
     finally:

@@ -19,7 +19,7 @@ try:
     deleted_count = cursor.rowcount
     conn.commit()
     
-    print(f"✅ Deleted {deleted_count} old sample predictions")
+    print(f" Deleted {deleted_count} old sample predictions")
     
     # Verify
     cursor.execute("SELECT COUNT(*) as count FROM predictions")

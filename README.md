@@ -1,4 +1,4 @@
-# TruthLens AI 🛡️ - Real-Time Fake News Detector
+# TruthLens AI  - Real-Time Fake News Detector
 
 A production-ready, full-stack AI-powered fake news detection system built with Flask, Machine Learning, and modern web technologies.
 
@@ -7,73 +7,33 @@ A production-ready, full-stack AI-powered fake news detection system built with 
 ![Machine Learning](https://img.shields.io/badge/ML-Scikit--learn-orange.svg)
 ![License](https://img.shields.io/badge/License-MIT-yellow.svg)
 
-## 🌟 Features
+##  Features
 
 ### Core Functionality
-- ✅ **Text Analysis**: Paste news article text for instant analysis
-- ✅ **URL Scraping**: Automatically extract content from news URLs
-- ✅ **Machine Learning**: Advanced Logistic Regression with TF-IDF vectorization
-- ✅ **Sentiment Analysis**: Detect emotional tone of articles
-- ✅ **Confidence Scoring**: Get prediction confidence percentages
-- ✅ **Real-time Processing**: Fast analysis with optimized ML pipeline
+-  **Text Analysis**: Paste news article text for instant analysis
+-  **URL Scraping**: Automatically extract content from news URLs
+-  **Machine Learning**: Advanced Logistic Regression with TF-IDF vectorization
+-  **Sentiment Analysis**: Detect emotional tone of articles
+-  **Confidence Scoring**: Get prediction confidence percentages
+-  **Real-time Processing**: Fast analysis with optimized ML pipeline
 
 ### Admin Dashboard
-- 📊 **Statistics Overview**: Total predictions, fake vs real counts
-- 📈 **Visual Analytics**: Interactive charts and graphs
-- 📝 **Recent History**: View latest predictions
-- 🔄 **Auto-refresh**: Real-time dashboard updates
-- 🔐 **Secure Login**: Protected admin area
+-  **Statistics Overview**: Total predictions, fake vs real counts
+-  **Visual Analytics**: Interactive charts and graphs
+-  **Recent History**: View latest predictions
+-  **Auto-refresh**: Real-time dashboard updates
+-  **Secure Login**: Protected admin area
 
 ### Technical Features
-- 🎨 **Glassmorphism UI**: Modern, beautiful interface with Tailwind CSS
-- 📱 **Responsive Design**: Works on desktop, tablet, and mobile
-- 🚀 **Production Ready**: Proper error handling and validation
-- 💾 **MySQL Database**: Persistent storage for all predictions
-- 🔒 **Session Management**: Secure user authentication
-- 📦 **Modular Architecture**: Clean, maintainable code structure
+-  **Glassmorphism UI**: Modern, beautiful interface with Tailwind CSS
+-  **Responsive Design**: Works on desktop, tablet, and mobile
+-  **Production Ready**: Proper error handling and validation
+-  **MySQL Database**: Persistent storage for all predictions
+-  **Session Management**: Secure user authentication
+-  **Modular Architecture**: Clean, maintainable code structure
 
-## 🏗️ Project Structure
 
-```
-TruthLens_AI/
-├── app/
-│   ├── __init__.py                 # Flask app factory
-│   ├── models/
-│   │   ├── __init__.py
-│   │   └── database.py             # Database models and operations
-│   ├── routes/
-│   │   ├── __init__.py
-│   │   ├── main.py                 # Main routes (prediction, home)
-│   │   └── auth.py                 # Authentication routes
-│   ├── utils/
-│   │   ├── __init__.py
-│   │   ├── ml_model.py             # ML model handler
-│   │   ├── text_processor.py      # Text preprocessing & NLP
-│   │   └── web_scraper.py         # URL content extraction
-│   ├── static/
-│   │   ├── css/
-│   │   │   └── style.css           # Custom styles
-│   │   └── js/
-│   │       ├── main.js             # Main page JavaScript
-│   │       └── dashboard.js        # Dashboard JavaScript
-│   └── templates/
-│       ├── index.html              # Main page
-│       ├── dashboard.html          # Admin dashboard
-│       └── login.html              # Login page
-├── ml_training/
-│   └── train_model.py              # Model training script
-├── models/
-│   ├── model.pkl                   # Trained ML model
-│   ├── vectorizer.pkl              # TF-IDF vectorizer
-│   └── model_info.txt              # Model information
-├── config.py                       # Configuration settings
-├── run.py                          # Application entry point
-├── requirements.txt                # Python dependencies
-├── database_schema.sql             # MySQL database schema
-└── README.md                       # This file
-```
-
-## 🚀 Quick Start
+##  Quick Start
 
 ### Prerequisites
 
@@ -155,9 +115,9 @@ TruthLens_AI/
 Username: admin
 Password: admin123
 ```
-**⚠️ IMPORTANT: Change these credentials in production!**
+** IMPORTANT: Change these credentials in production!**
 
-## 📖 Usage Guide
+##  Usage Guide
 
 ### Analyzing News
 
@@ -184,7 +144,7 @@ Password: admin123
    - Interactive charts
    - Recent predictions history
 
-## 🔧 Configuration
+##  Configuration
 
 ### Environment Variables
 
@@ -210,7 +170,7 @@ Edit `config.py` for advanced settings:
 - **Rate limiting**: `RATE_LIMIT`
 - **Debug mode**: `DEBUG`
 
-## 🤖 Machine Learning Details
+##  Machine Learning Details
 
 ### Model Architecture
 - **Algorithm**: Logistic Regression
@@ -245,7 +205,7 @@ For production use:
   - FakeNewsNet
   - ISOT Fake News Dataset
 
-## 🎨 UI Features
+##  UI Features
 
 ### Design Elements
 - **Glassmorphism**: Modern frosted glass effect
@@ -262,7 +222,7 @@ For production use:
 - Success: Green (#10b981)
 - Error: Red (#ef4444)
 
-## 🔐 Security Features
+##  Security Features
 
 - Session-based authentication
 - Password hashing (production ready)
@@ -272,7 +232,7 @@ For production use:
 - CORS configuration
 - Secure cookie settings
 
-## 📊 Database Schema
+##  Database Schema
 
 ### Tables
 
@@ -285,7 +245,7 @@ For production use:
 - sentiment, sentiment_score, user_ip, user_agent
 - processing_time, timestamp
 
-## 🐛 Troubleshooting
+##  Troubleshooting
 
 ### Common Issues
 
@@ -316,7 +276,7 @@ nltk.download('stopwords')
 app.run(port=5001)
 ```
 
-## 🚀 Deployment
+##  Deployment
 
 ### Production Checklist
 
@@ -350,7 +310,7 @@ COPY . .
 CMD ["gunicorn", "-w", "4", "-b", "0.0.0.0:5000", "run:app"]
 ```
 
-## 📈 Future Enhancements
+##  Future Enhancements
 
 - [ ] Multi-language support
 - [ ] Deep learning models (BERT, GPT)
@@ -362,7 +322,7 @@ CMD ["gunicorn", "-w", "4", "-b", "0.0.0.0:5000", "run:app"]
 - [ ] Advanced analytics
 - [ ] A/B testing for models
 
-## 🤝 Contributing
+##  Contributing
 
 Contributions are welcome! Please:
 
@@ -372,42 +332,7 @@ Contributions are welcome! Please:
 4. Push to the branch
 5. Open a Pull Request
 
-## 📝 License
+##  License
 
 This project is licensed under the MIT License.
 
-## 👥 Authors
-
-- Built with ❤️ by AI Engineering Team
-- Powered by Flask, Scikit-learn, and Tailwind CSS
-
-## 🙏 Acknowledgments
-
-- Scikit-learn for ML algorithms
-- NLTK for NLP capabilities
-- Flask team for the amazing framework
-- Tailwind CSS for beautiful styling
-- Chart.js for data visualization
-
-## 📞 Support
-
-For issues and questions:
-- Open an issue on GitHub
-- Check the troubleshooting section
-- Review the documentation
-
-## 🔄 Updates
-
-**Version 1.0.0** (2026-02-15)
-- Initial release
-- Core fake news detection
-- Admin dashboard
-- URL scraping feature
-- Sentiment analysis
-- Responsive UI
-
----
-
-**⚠️ Disclaimer**: This tool is for educational and research purposes. Always verify information from multiple reliable sources before drawing conclusions about news authenticity.
-
-**Made with Python 🐍 | Flask 🌶️ | Machine Learning 🤖 | Tailwind CSS 🎨**
